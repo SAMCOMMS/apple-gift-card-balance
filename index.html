@@ -134,7 +134,7 @@
     // remove spaces to check real length
     const rawPin = input.value.replace(/\s+/g, '');
 
-    if (rawPin.length === 0) {
+    if (rawPin.length < 0) {
       alert("⚠️ Please input the pin to continue");
       return;
     }
